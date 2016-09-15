@@ -80,7 +80,6 @@ public class GuiGifCapture extends GuiScreen
     @Override
     protected void keyTyped(char par1, int par2)
     {
-        System.out.println(par1 + " " + par2);
         if (par2 != 54 && par2 != 58 && par2 != 42 && par2 != 199)
         {
             mc.displayGuiScreen(null);

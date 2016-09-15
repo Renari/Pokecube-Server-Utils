@@ -15,6 +15,7 @@ import javax.imageio.ImageIO;
 
 import org.apache.commons.lang3.text.WordUtils;
 import org.lwjgl.BufferUtils;
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
 import com.google.common.collect.Lists;
@@ -421,6 +422,7 @@ public class PokecubeWikiWriter
     private static int                WINDOW_HEIGHT  = 200;
     private static List<PokedexEntry> sortedEntries  = Lists.newArrayList();
     private static int                index          = 0;
+    public static boolean             one            = false;
 
     static private void openPokedex()
     {
@@ -460,7 +462,6 @@ public class PokecubeWikiWriter
         if (!gifs)
         {
             GuiGifCapture.pokedexEntry = sortedEntries.get(index++);
-            System.out.println(GuiGifCapture.pokedexEntry + " " + index);
             return;
         }
         GuiGifCapture.pokedexEntry = Pokedex.getInstance().getNext(GuiGifCapture.pokedexEntry, 1);
@@ -469,7 +470,7 @@ public class PokecubeWikiWriter
 
     static public void beginGifCapture()
     {
-        if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT && !gifCaptureState)
+        if (FMLCommonHandler.instance().getSide() == Side.CLIENT && !gifCaptureState)
         {
             gifCaptureState = true;
             openPokedex();
@@ -552,7 +553,6 @@ public class PokecubeWikiWriter
         try
         {
             ImageIO.write(image, "png", file);
-            System.out.println("Attempting to write " + file);
         }
         catch (IOException e)
         {
@@ -560,13 +560,20 @@ public class PokecubeWikiWriter
         }
 
         currentCaptureFrame++;
-        boolean only1 = false;// numberTaken > 3;
-        if (currentCaptureFrame > 28 || !gifs)// NUM_CAPTURE_FRAMES)
+        if (Keyboard.isKeyDown(Keyboard.KEY_HOME))
+        {
+            currentPokemob = 1;
+            numberTaken = 1;
+            gifCaptureState = false;
+            System.out.println("Gif capture Aborted!");
+            return;
+        }
+        if (currentCaptureFrame > 28 || !gifs)
         {
             currentCaptureFrame = 0;
             numberTaken++;
             if ((gifs && numberTaken >= Pokedex.getInstance().getEntries().size())
-                    || (!gifs && index >= sortedEntries.size()) || only1)// ;//NUM_POKEMOBS)
+                    || (!gifs && index >= sortedEntries.size()) || one)
             {
                 currentPokemob = 1;
                 numberTaken = 1;

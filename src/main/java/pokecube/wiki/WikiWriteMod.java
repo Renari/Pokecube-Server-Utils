@@ -2,8 +2,6 @@ package pokecube.wiki;
 
 import java.util.Map;
 
-import org.lwjgl.input.Keyboard;
-
 import com.google.common.collect.Maps;
 
 import net.minecraft.client.Minecraft;
@@ -12,6 +10,7 @@ import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
@@ -20,12 +19,11 @@ import net.minecraftforge.fml.common.Mod.Instance;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent;
 import net.minecraftforge.fml.common.network.IGuiHandler;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import pokecube.core.database.Database;
+import pokecube.core.database.Pokedex;
 import pokecube.core.database.PokedexEntry;
 
 @Mod(modid = WikiWriteMod.MODID, name = "wikiwriter", version = WikiWriteMod.VERSION, dependencies = "required-after:pokecube", acceptableRemoteVersions = "*", acceptedMinecraftVersions = WikiWriteMod.MCVERSIONS)
@@ -71,11 +69,35 @@ public class WikiWriteMod
             @Override
             public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException
             {
+                EntityPlayer player = getCommandSenderAsPlayer(sender);
                 if (args.length == 1 && args[0].equals("all"))
                 {
                     PokecubeWikiWriter.writeWiki();
                 }
-                else PokecubeWikiWriter.outputPokemonWikiInfo2(Database.getEntry("arceus"));
+                else if (args.length >= 2 && args[0].equals("img"))
+                {
+                    boolean shiny = args.length == 3 && args[2].equalsIgnoreCase("S");
+                    boolean all = args[1].equalsIgnoreCase("all");
+                    if (server instanceof IntegratedServer)
+                    {
+                        GuiGifCapture.shiny = shiny;
+                        PokedexEntry init = Pokedex.getInstance().getFirstEntry();
+                        if (all)
+                        {
+
+                        }
+                        else
+                        {
+                            init = Database.getEntry(args[1]);
+                        }
+                        if (init == null) throw new CommandException("Error in pokedex entry for " + args[2]);
+                        PokecubeWikiWriter.one = !all;
+                        PokecubeWikiWriter.gifs = false;
+                        PokecubeWikiWriter.beginGifCapture();
+                        GuiGifCapture.pokedexEntry = init;
+                        Minecraft.getMinecraft().thePlayer.openGui(instance, 0, player.worldObj, 0, 0, 0);
+                    }
+                }
             }
         });
     }
@@ -92,36 +114,13 @@ public class WikiWriteMod
         @Override
         public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z)
         {
-            // TODO Auto-generated method stub
             return null;
         }
 
         @Override
         public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z)
         {
-            // TODO Auto-generated method stub
             return null;
-        }
-    }
-
-    @SubscribeEvent
-    public void keyInput(KeyInputEvent evt)
-    {
-        if (Keyboard.isKeyDown(Keyboard.KEY_DELETE) && Minecraft.getMinecraft().currentScreen == null)
-        {
-            System.out.println("Test");
-            PokecubeWikiWriter.gifs = false;// Keyboard.isKeyDown(Keyboard.KEY_LSHIFT);
-            GuiGifCapture.shiny = Keyboard.isKeyDown(Keyboard.KEY_LMENU);
-            System.out.println(GuiGifCapture.shiny + " ");
-            PokecubeWikiWriter.beginGifCapture();
-        }
-        if (Keyboard.isKeyDown(Keyboard.KEY_HOME) && Minecraft.getMinecraft().currentScreen == null)
-        {
-            GuiGifCapture.shiny = Keyboard.isKeyDown(Keyboard.KEY_LMENU);
-            GuiGifCapture.pokedexEntry = Database.getEntry(1);
-            System.out.println(GuiGifCapture.shiny + " ");
-            Minecraft.getMinecraft().thePlayer.openGui(WikiWriteMod.instance, 0,
-                    Minecraft.getMinecraft().thePlayer.getEntityWorld(), 0, 0, 0);
         }
     }
 
