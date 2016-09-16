@@ -45,71 +45,72 @@ public class PokecubeWikiWriter
 
     static String              pokemobDir = "https://github.com/Thutmose/Pokecube/wiki/";
     static String              gifDir     = "https://raw.githubusercontent.com/wiki/Thutmose/Pokecube/pokemobs/img/";
+    public static String       pagePrefix = "";
 
-    static String formatLinkName(String link, String name)
+    static String formatLink(String link, String name)
     {
         return "[" + name + "](" + link + ")";
     }
 
-    static String formatLink(String dir, String name, String ext)
+    static String formatPokemobLink(PokedexEntry entry)
     {
-        return "[" + name + "](" + dir + name + ext + ")";
+        return formatLink(pokemobDir + pagePrefix + entry.getName(), entry.getTranslatedName());
     }
+
+    // static String formatLink(String dir, String name, String ext, String
+    // pref)
+    // {
+    // return "[" + name + "](" + dir + name + ext + ")";
+    // }
 
     static void writeWiki()
     {
-        int n = 0;
         pokemobDir = "https://github.com/Thutmose/Pokecube/wiki/";
-        for (n = 1; n < 750; n++)
+
+        String code = Minecraft.getMinecraft().getLanguageManager().getCurrentLanguage().getLanguageCode();
+        if (code.equals("en_US"))
         {
-            PokedexEntry entry = Database.getEntry(n);
-            if (entry != null) outputPokemonWikiInfo2(entry);
+            pagePrefix = "";
+        }
+        else
+        {
+            pagePrefix = code + "-";
+        }
+
+        for (PokedexEntry entry : Database.baseFormes.values())
+        {
+            outputPokemonWikiInfo2(entry);
         }
         writeWikiPokemobList();
-        writeWikiHome();
-    }
-
-    static void writeWikiHome()
-    {
-        try
-        {
-            String fileName = Compat.CUSTOMSPAWNSFILE.replace("spawns.xml", "Home.md");
-            fwriter = new FileWriter(fileName);
-            out = new PrintWriter(fwriter);
-            out.println("#Welcome to the Pokemob Wiki by Thutmose");
-            out.println("##List of Mobs");
-            out.println(formatLinkName("pokemobList", "List of Pokemobs"));
-            out.println("##List of Blocks");
-            out.println("##List of Items");
-            out.close();
-            fwriter.close();
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
     }
 
     static void writeWikiPokemobList()
     {
         try
         {
-            String fileName = Compat.CUSTOMSPAWNSFILE.replace("spawns.xml", "pokemobList.md");
+            String fileName = Compat.CUSTOMSPAWNSFILE.replace("spawns.xml", pagePrefix + "pokemobList.md");
             fwriter = new FileWriter(fileName);
             out = new PrintWriter(fwriter);
-            out.println("#List of Pokemobs Currently in Pokecube");
+            out.println("#" + I18n.format("list.pokemobs.title"));
             out.println("|  |  |  |  |");
             out.println("| --- | --- | --- | --- |");
             int n = 0;
             boolean ended = false;
-            int m = 0;
-            for (m = 1; m < 750; m++)
+
+            List<PokedexEntry> entries = Lists.newArrayList(Database.baseFormes.values());
+            Collections.sort(entries, new Comparator<PokedexEntry>()
             {
-                PokedexEntry e = Database.getEntry(m);
+                @Override
+                public int compare(PokedexEntry o1, PokedexEntry o2)
+                {
+                    return o1.getPokedexNb() - o1.getPokedexNb();
+                }
+            });
+            for (PokedexEntry e : entries)
+            {
                 if (e == null) continue;
                 ended = false;
-                String name = I18n.format(e.getUnlocalizedName());
-                out.print("| " + formatLink(pokemobDir, name, ""));
+                out.print("| " + formatLink(pokemobDir + pagePrefix + e.getName(), e.getTranslatedName()));
                 if (n % 4 == 3)
                 {
                     out.print("| \n");
@@ -134,18 +135,18 @@ public class PokecubeWikiWriter
     {
         try
         {
-            String name = I18n.format(entry.getUnlocalizedName());
-            String fileName = Compat.CUSTOMSPAWNSFILE.replace("spawns.xml", "pokemobs/" + name + ".md");
-            File temp = new File(fileName.replace(entry.getName() + ".md", ""));
+            String fileName = Compat.CUSTOMSPAWNSFILE.replace("spawns.xml",
+                    "pokemobs/" + pagePrefix + entry.getName() + ".md");
+            File temp = new File(fileName.replace(pagePrefix + entry.getName() + ".md", ""));
             if (!temp.exists())
             {
                 temp.mkdirs();
             }
             fwriter = new FileWriter(fileName);
             out = new PrintWriter(fwriter);
-            String typeString = WordUtils.capitalize(PokeType.getName(entry.getType1()));
+            String typeString = WordUtils.capitalize(PokeType.getTranslatedName(entry.getType1()));
             if (entry.getType2() != PokeType.unknown)
-                typeString += "/" + WordUtils.capitalize(PokeType.getName(entry.getType2()));
+                typeString += "/" + WordUtils.capitalize(PokeType.getTranslatedName(entry.getType2()));
 
             // Print links to other pokemon
             PokedexEntry nex = Pokedex.getInstance().getNext(entry, 1);
@@ -156,25 +157,26 @@ public class PokecubeWikiWriter
             String next = "";
             if (nex != entry)
             {
-                next = formatLink(pokemobDir, nex.getName(), "");
+                next = formatLink(pokemobDir + pagePrefix + nex.getName(), nex.getTranslatedName());
             }
             String prev = "";
             if (pre != entry)
             {
-                prev = formatLink(pokemobDir, pre.getName(), "");
+                prev = formatLink(pokemobDir + pagePrefix + pre.getName(), pre.getTranslatedName());
             }
             otherPokemon = "| " + prev + otherPokemon + next + " |";
 
             out.println(otherPokemon);
 
             // Print the name and header
-            out.println("#" + entry.getName());
+            out.println("#" + entry.getTranslatedName());
             String numString = entry.getPokedexNb() + "";
             if (entry.getPokedexNb() < 10) numString = "00" + numString;
             else if (entry.getPokedexNb() < 100) numString = "0" + numString;
             out.println(" | ");
             out.println("--- | ---");
-            out.println("| Type: " + typeString + "\n" + "Number: " + numString + "| \n");
+            out.println("| " + I18n.format("pokemob.type", typeString) + "\n" + I18n.format("pokemob.number", numString)
+                    + "| \n");
             if (entry.hasShiny)
             {
                 out.println("[[" + gifDir + entry.getName() + ".png]]" + "[[" + gifDir + entry.getName() + "S.png]]");
@@ -185,56 +187,69 @@ public class PokecubeWikiWriter
             }
 
             // Print the description
-            out.println("##Description");
-            String desc = entry.getName() + " is a " + typeString + " pokemob.";
+            out.println("##" + I18n.format("pokemob.description.header"));
+            out.println(I18n.format("pokemob.description.type", entry.getTranslatedName(), typeString));
             if (entry.canEvolve())
             {
                 for (EvolutionData d : entry.evolutions)
                 {
                     if (d.evolution == null) continue;
-                    String evoString = formatLink(pokemobDir, d.evolution.getName(), "");
+                    nex = d.evolution;
+                    String evoLink = formatLink(pokemobDir + pagePrefix + nex.getName(), nex.getTranslatedName());
+                    String evoString = null;
                     if (d.level > 0)
                     {
-                        evoString += " at Level " + d.level;
+                        evoString = I18n.format("pokemob.description.evolve.level", entry.getTranslatedName(), evoLink,
+                                d.level);
                     }
                     else if (d.item != null && d.gender == 0)
                     {
-                        evoString += " when given " + d.item.getDisplayName();
+                        evoString = I18n.format("pokemob.description.evolve.item", entry.getTranslatedName(), evoLink,
+                                d.item.getDisplayName());
                     }
                     else if (d.item != null && d.gender == 1)
                     {
-                        evoString += " when male and given " + d.item.getDisplayName();
+                        evoString = I18n.format("pokemob.description.evolve.item.male", entry.getTranslatedName(),
+                                evoLink, d.item.getDisplayName());
                     }
                     else if (d.item != null && d.gender == 2)
                     {
-                        evoString += " when female and given " + d.item.getDisplayName();
+                        evoString = I18n.format("pokemob.description.evolve.item.female", entry.getTranslatedName(),
+                                evoLink, d.item.getDisplayName());
                     }
                     else if (d.traded && d.item != null)
                     {
-                        evoString += " when traded and given " + d.item.getDisplayName();
+                        evoString = I18n.format("pokemob.description.evolve.traded.item", entry.getTranslatedName(),
+                                evoLink, d.item.getDisplayName());
                     }
                     else if (d.happy)
                     {
-                        evoString += " when Happy";
+                        evoString = I18n.format("pokemob.description.evolve.happy", entry.getTranslatedName(), evoLink);
                     }
                     else if (d.traded)
                     {
-                        evoString += " when traded";
+                        evoString = I18n.format("pokemob.description.evolve.traded", entry.getTranslatedName(),
+                                evoLink);
                     }
-                    desc += " " + entry.getName() + " Evolves into " + evoString + ".";
+                    else if (d.move != null && !d.move.isEmpty())
+                    {
+                        evoString = I18n.format("pokemob.description.evolve.move", entry.getTranslatedName(), evoLink,
+                                MovesUtils.getLocalizedMove(d.move));
+                    }
+                    if (evoString != null) out.print(evoString);
                 }
-
             }
             if (entry.evolvesFrom != null)
             {
-                String evoString = formatLink(pokemobDir, entry.evolvesFrom.getName(), "");
-                desc += " " + entry.getName() + " Evolves from " + evoString + ".";
+                String evoString = formatLink(pokemobDir + pagePrefix + entry.evolvesFrom.getName(),
+                        entry.evolvesFrom.getTranslatedName());
+                out.println(I18n.format("pokemob.description.evolve.from", entry.getTranslatedName(), evoString));
             }
-            out.println(desc);
+            out.println();
 
             // Print move list
-            out.println("##Natural Moves List");
-            out.println("| Level | Move | ");
+            out.println("##" + I18n.format("pokemob.movelist.title"));
+            out.println(I18n.format("pokemob.movelist.header"));
             out.println("| --- | --- | ");
             List<String> moves = Lists.newArrayList(entry.getMoves());
             List<String> used = Lists.newArrayList();
@@ -257,7 +272,7 @@ public class PokecubeWikiWriter
 
             if (moves.size() > 0)
             {
-                out.println("##TM or Egg Moves List");
+                out.println("##" + I18n.format("pokemob.tmlist.title"));
                 out.println("|  |  |  |  |");
                 out.println("| --- | --- | --- | --- |");
                 boolean ended = false;
@@ -280,7 +295,7 @@ public class PokecubeWikiWriter
             }
             if (!entry.related.isEmpty())
             {
-                out.println("##Compatable for Breeding");
+                out.println("##" + I18n.format("pokemob.breedinglist.title"));
                 out.println("|  |  |  |  |");
                 out.println("| --- | --- | --- | --- |");
                 int n = 0;
@@ -289,7 +304,7 @@ public class PokecubeWikiWriter
                 {
                     if (e == null) continue;
                     ended = false;
-                    out.print("| " + formatLink(pokemobDir, e.getName(), ""));
+                    out.print("| " + formatPokemobLink(e));
                     if (n % 4 == 3)
                     {
                         out.print("| \n");
@@ -309,7 +324,7 @@ public class PokecubeWikiWriter
             }
             if (data != null)
             {
-                out.println("##Biomes Found in");
+                out.println("##" + I18n.format("pokemob.biomeslist.title"));
                 out.println("|  |  |  |  |");
                 out.println("| --- | --- | --- | --- |");
                 int n = 0;
@@ -377,17 +392,17 @@ public class PokecubeWikiWriter
 
             if (!entry.forms.isEmpty())
             {
-                out.println("##Alternate Formes");
+                out.println("##" + I18n.format("pokemob.alternateformes.title"));
                 for (PokedexEntry entry1 : entry.forms.values())
                 {
-                    typeString = WordUtils.capitalize(PokeType.getName(entry1.getType1()));
+                    typeString = WordUtils.capitalize(PokeType.getTranslatedName(entry1.getType1()));
                     if (entry1.getType2() != PokeType.unknown)
-                        typeString += "/" + WordUtils.capitalize(PokeType.getName(entry1.getType2()));
+                        typeString += "/" + WordUtils.capitalize(PokeType.getTranslatedName(entry1.getType2()));
                     // Print the name and header
-                    out.println("##" + entry1.getName());
+                    out.println("##" + entry1.getTranslatedName());
                     out.println("| |");
                     out.println("| --- |");
-                    out.println("| Type: " + typeString + " |");
+                    out.println("| " + I18n.format("pokemob.type", typeString) + " |");
                     if (entry1.hasShiny)
                     {
                         out.println("[[" + gifDir + entry1.getName() + ".png]]" + "[[" + gifDir + entry1.getName()
@@ -400,8 +415,8 @@ public class PokecubeWikiWriter
                 }
             }
 
-            out.println(formatLinkName("pokemobList", "List of Pokemobs") + "-------" + formatLinkName("Home", "Home")
-                    + "\n");
+            out.println(formatLink(pagePrefix + "pokemobList", I18n.format("list.pokemobs.link")) + "-------"
+                    + formatLink(pagePrefix + "Home", I18n.format("home.link")) + "\n");
             out.close();
             fwriter.close();
         }
