@@ -21,6 +21,7 @@ import pokecube.core.PokecubeCore;
 import pokecube.core.database.Database;
 import pokecube.core.database.PokedexEntry;
 import pokecube.core.events.CaptureEvent;
+import pokecube.core.events.CommandAttackEvent;
 import pokecube.core.events.PostPostInit;
 import pokecube.core.events.SpawnEvent.SendOut;
 import pokecube.core.interfaces.PokecubeMod;
@@ -107,7 +108,7 @@ public class PokeServerUtils
     @SubscribeEvent
     public void onSendOut(SendOut.Pre evt)
     {
-        if (!config.enabled) return;
+        if (!config.dimsEnabled) return;
         int dim = evt.world.provider.getDimension();
         boolean inList = dimensionList.contains(dim);
         if (config.whitelist)
@@ -124,5 +125,12 @@ public class PokeServerUtils
                 evt.setCanceled(true);
             }
         }
+    }
+
+    @SubscribeEvent
+    public void onAttackCommand(CommandAttackEvent event)
+    {
+        if (!config.turnbased) return;
+
     }
 }

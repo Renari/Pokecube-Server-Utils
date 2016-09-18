@@ -8,24 +8,28 @@ import thut.core.common.config.Configure;
 
 public class Config extends ConfigBase
 {
-    private static final String capture                  = "captureRestriction";
-    private static final String dimensionControl         = "dimensionControl";
+    private static final String CAPTURE                  = "captureRestriction";
+    private static final String DIMCTRL                  = "dimensionControl";
+    private static final String CBTMODE                  = "battlemode";
 
-    @Configure(category = capture)
+    @Configure(category = CAPTURE)
     int                         maxCaptureLevelNormal    = 100;
-    @Configure(category = capture)
+    @Configure(category = CAPTURE)
     int                         maxCaptureLevelLegendary = 100;
-    @Configure(category = capture)
+    @Configure(category = CAPTURE)
     String[]                    maxCaptureLevelOverrides = { "mew:100" };
 
-    @Configure(category = dimensionControl)
+    @Configure(category = DIMCTRL)
     int[]                       dimensions               = {};
-    @Configure(category = dimensionControl)
-    boolean                     enabled                  = false;
-    @Configure(category = dimensionControl)
+    @Configure(category = DIMCTRL)
+    boolean                     dimsEnabled              = false;
+    @Configure(category = DIMCTRL)
     boolean                     whitelist                = false;
-    @Configure(category = dimensionControl)
+    @Configure(category = DIMCTRL)
     boolean                     blacklist                = false;
+
+    @Configure(category = CBTMODE)
+    boolean                     turnbased                = false;
 
     public Config()
     {
