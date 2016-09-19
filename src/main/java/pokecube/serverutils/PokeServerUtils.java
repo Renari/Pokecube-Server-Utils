@@ -7,6 +7,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.common.MinecraftForge;
@@ -18,14 +19,20 @@ import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.eventhandler.Event.Result;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import pokecube.core.PokecubeCore;
+import pokecube.core.ai.thread.IAIRunnable;
+import pokecube.core.ai.thread.aiRunnables.AIAttack;
 import pokecube.core.database.Database;
 import pokecube.core.database.PokedexEntry;
 import pokecube.core.events.CaptureEvent;
 import pokecube.core.events.CommandAttackEvent;
+import pokecube.core.events.InitAIEvent;
+import pokecube.core.events.MoveUse;
 import pokecube.core.events.PostPostInit;
 import pokecube.core.events.SpawnEvent.SendOut;
+import pokecube.core.interfaces.IPokemob;
 import pokecube.core.interfaces.PokecubeMod;
 import pokecube.core.items.pokecubes.EntityPokecube;
+import pokecube.serverutils.ai.pokemob.AITurnAttack;
 
 @Mod(modid = PokeServerUtils.MODID, name = "Pokecube Server Utils", version = PokeServerUtils.VERSION, dependencies = "required-after:pokecube", acceptableRemoteVersions = "*")
 public class PokeServerUtils
@@ -130,7 +137,61 @@ public class PokeServerUtils
     @SubscribeEvent
     public void onAttackCommand(CommandAttackEvent event)
     {
-        if (!config.turnbased) return;
+        if (!config.turnbased || !event.getPokemob().getPokemonAIState(IPokemob.ANGRY)) return;
+        for (IAIRunnable ai : event.getPokemob().getAIStuff().aiTasks)
+        {
+            if (ai instanceof AITurnAttack)
+            {
+                AITurnAttack task = (AITurnAttack) ai;
+                task.hasOrders = true;
+                return;
+            }
+        }
+    }
 
+    @SubscribeEvent
+    public void onAttackCommand(InitAIEvent event)
+    {
+        if (!config.turnbased || event.getPokemob().getAIStuff() == null) return;
+        AITurnAttack attack = new AITurnAttack((EntityLiving) event.getEntity());
+        for (IAIRunnable ai : event.getPokemob().getAIStuff().aiTasks)
+        {
+            if (ai instanceof AIAttack)
+            {
+                AIAttack old = (AIAttack) ai;
+                event.getPokemob().getAIStuff().aiTasks.remove(old);
+                attack.setMutex(old.getMutex());
+                attack.setPriority(old.getPriority());
+                event.getPokemob().getAIStuff().aiTasks.add(0, attack);
+                break;
+            }
+        }
+
+    }
+
+    @SubscribeEvent
+    public void onAttackUse(MoveUse.ActualMoveUse.Post event)
+    {
+        if (!config.turnbased||  !(event.getTarget() instanceof IPokemob))
+            return;
+        System.out.println("tick");
+        for (IAIRunnable ai : event.getUser().getAIStuff().aiTasks)
+        {
+            if (ai instanceof AITurnAttack)
+            {
+                AITurnAttack task = (AITurnAttack) ai;
+                task.hasOrders = false;
+                break;
+            }
+        }
+        for (IAIRunnable ai : ((IPokemob) event.getTarget()).getAIStuff().aiTasks)
+        {
+            if (ai instanceof AITurnAttack)
+            {
+                AITurnAttack task = (AITurnAttack) ai;
+                task.hasOrders = false;
+                break;
+            }
+        }
     }
 }
