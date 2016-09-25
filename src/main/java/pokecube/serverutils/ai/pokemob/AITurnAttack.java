@@ -9,7 +9,8 @@ import pokecube.core.interfaces.IPokemob;
 
 public class AITurnAttack extends AIAttack
 {
-    public boolean hasOrders = false;
+    public boolean hasOrders       = false;
+    public boolean executingOrders = false;
     final IPokemob pokemob;
 
     public AITurnAttack(EntityLiving par1EntityLiving)
@@ -23,6 +24,7 @@ public class AITurnAttack extends AIAttack
     {
         EntityLivingBase target = attacker.getAttackTarget();
         AITurnAttack task = null;
+        task:
         if (target instanceof IPokemob && ((IPokemob) target).getAIStuff() != null)
         {
             for (IAIRunnable ai : ((IPokemob) target).getAIStuff().aiTasks)
@@ -33,15 +35,22 @@ public class AITurnAttack extends AIAttack
                     break;
                 }
             }
-            if (task != null && !pokemob.isPlayerOwned()) hasOrders = task.hasOrders;
-            if (task != null && (!hasOrders || !task.hasOrders))
+            if (task == null) break task;
+            if (!pokemob.isPlayerOwned()) hasOrders = task.hasOrders;
+            boolean bothOrder = hasOrders && task.hasOrders;
+
+            if (!bothOrder && !executingOrders)
             {
                 delayTime = 20;
             }
             else if (hasOrders && task.hasOrders)
             {
                 delayTime = 0;
+                executingOrders = true;
+                hasOrders = false;
                 task.delayTime = 0;
+                task.executingOrders = true;
+                task.hasOrders = false;
             }
         }
         super.doMainThreadTick(world);

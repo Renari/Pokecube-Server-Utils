@@ -61,7 +61,7 @@ public class SettingsCommand extends CommandBase
         try
         {
             String text = "";
-            Object o = field.get(PokeServerUtils.instance.config);
+            Object o = field.get(PokeServerUtils.config);
             if (o instanceof String[])
             {
                 text += Arrays.toString((Object[]) o);
@@ -98,7 +98,7 @@ public class SettingsCommand extends CommandBase
                             val = val + " " + args[i];
                         }
                     }
-                    PokeServerUtils.instance.config.updateField(field, val);
+                    PokeServerUtils.config.updateField(field, val);
                 }
                 catch (Exception e)
                 {
@@ -108,7 +108,7 @@ public class SettingsCommand extends CommandBase
                     return;
                 }
                 text = "";
-                o = field.get(PokeServerUtils.instance.config);
+                o = field.get(PokeServerUtils.config);
                 if (o instanceof String[])
                 {
                     text += Arrays.toString((Object[]) o);
@@ -181,6 +181,7 @@ public class SettingsCommand extends CommandBase
                     return o1.compareToIgnoreCase(o2);
                 }
             });
+            ret = getListOfStringsMatchingLastWord(args, ret);
         }
         return ret;
     }

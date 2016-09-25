@@ -51,6 +51,8 @@ public class Config extends ConfigBase
         PokeServerUtils.instance.dimensionList.clear();
         for (int i : dimensions)
             PokeServerUtils.instance.dimensionList.add(i);
+        PokeServerUtils.turnbasedManager.disable();
+        if (turnbased) PokeServerUtils.turnbasedManager.enable();
     }
 
 }
