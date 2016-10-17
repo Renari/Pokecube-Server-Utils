@@ -81,50 +81,47 @@ public class SettingsCommand extends CommandBase
                 sender.addChatMessage(mess);
                 return;
             }
-            else
+            if (!op)
             {
-                if (!op)
-                {
-                    CommandTools.sendNoPermissions(sender);
-                    return;
-                }
-                try
-                {
-                    String val = args[1];
-                    if (args.length > 2)
-                    {
-                        for (int i = 2; i < args.length; i++)
-                        {
-                            val = val + " " + args[i];
-                        }
-                    }
-                    PokeServerUtils.config.updateField(field, val);
-                }
-                catch (Exception e)
-                {
-                    mess = CommandTools.makeTranslatedMessage("pokecube.command.settings.invalid", "gold", args[0]);
-                    sender.addChatMessage(mess);
-                    CommandTools.sendError(sender, text);
-                    return;
-                }
-                text = "";
-                o = field.get(PokeServerUtils.config);
-                if (o instanceof String[])
-                {
-                    text += Arrays.toString((Object[]) o);
-                }
-                else if (o instanceof int[])
-                {
-                    text += Arrays.toString((int[]) o);
-                }
-                else
-                {
-                    text += o;
-                }
-                mess = CommandTools.makeTranslatedMessage("pokecube.command.settings.set", "gold", args[0], text);
-                sender.addChatMessage(mess);
+                CommandTools.sendNoPermissions(sender);
                 return;
             }
+            try
+            {
+                String val = args[1];
+                if (args.length > 2)
+                {
+                    for (int i = 2; i < args.length; i++)
+                    {
+                        val = val + " " + args[i];
+                    }
+                }
+                PokeServerUtils.config.updateField(field, val);
+            }
+            catch (Exception e)
+            {
+                mess = CommandTools.makeTranslatedMessage("pokecube.command.settings.invalid", "gold", args[0]);
+                sender.addChatMessage(mess);
+                CommandTools.sendError(sender, text);
+                return;
+            }
+            text = "";
+            o = field.get(PokeServerUtils.config);
+            if (o instanceof String[])
+            {
+                text += Arrays.toString((Object[]) o);
+            }
+            else if (o instanceof int[])
+            {
+                text += Arrays.toString((int[]) o);
+            }
+            else
+            {
+                text += o;
+            }
+            mess = CommandTools.makeTranslatedMessage("pokecube.command.settings.set", "gold", args[0], text);
+            sender.addChatMessage(mess);
+            return;
         }
         catch (Exception e)
         {

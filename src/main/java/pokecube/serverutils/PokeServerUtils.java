@@ -8,8 +8,11 @@ import com.google.common.collect.Sets;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.Mod.Instance;
@@ -23,6 +26,7 @@ import pokecube.core.database.PokedexEntry;
 import pokecube.core.events.CaptureEvent;
 import pokecube.core.events.PostPostInit;
 import pokecube.core.events.SpawnEvent.SendOut;
+import pokecube.core.interfaces.IPokemob;
 import pokecube.core.interfaces.PokecubeMod;
 import pokecube.core.items.pokecubes.EntityPokecube;
 
@@ -30,7 +34,7 @@ import pokecube.core.items.pokecubes.EntityPokecube;
 public class PokeServerUtils
 {
     public static final String             MODID            = "pokecubeserverutils";
-    public static final String             VERSION          = "1.0.0";
+    public static final String             VERSION          = "1.2.0";
 
     @Instance(value = MODID)
     public static PokeServerUtils          instance;
@@ -106,8 +110,49 @@ public class PokeServerUtils
     }
 
     @SubscribeEvent
+    public void mobTickEvent(LivingUpdateEvent event)
+    {
+        if (config.pokemobBlacklistenabled && event.getEntityLiving() instanceof IPokemob)
+        {
+            IPokemob pokemob = (IPokemob) event.getEntityLiving();
+            PokedexEntry entry = pokemob.getPokedexEntry();
+            for (String s : config.pokemobBlacklist)
+            {
+                if (entry == Database.getEntry(s))
+                {
+                    pokemob.returnToPokecube();
+                    if (pokemob.getPokemonOwner() != null)
+                    {
+                        pokemob.getPokemonOwner().addChatMessage(
+                                new TextComponentString(TextFormatting.RED + "You are not allowed to use that."));
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent
     public void onSendOut(SendOut.Pre evt)
     {
+        if (config.pokemobBlacklistenabled)
+        {
+            PokedexEntry entry = evt.pokemob.getPokedexEntry();
+            for (String s : config.pokemobBlacklist)
+            {
+                if (entry == Database.getEntry(s))
+                {
+                    evt.setCanceled(true);
+                    if (evt.pokemob.getPokemonOwner() != null)
+                    {
+                        evt.pokemob.getPokemonOwner().addChatMessage(
+                                new TextComponentString(TextFormatting.RED + "You are not allowed to use that."));
+                    }
+                    break;
+                }
+            }
+        }
+
         if (!config.dimsEnabled) return;
         int dim = evt.world.provider.getDimension();
         boolean inList = dimensionList.contains(dim);

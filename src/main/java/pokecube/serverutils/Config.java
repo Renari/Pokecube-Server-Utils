@@ -11,6 +11,7 @@ public class Config extends ConfigBase
     private static final String CAPTURE                  = "captureRestriction";
     private static final String DIMCTRL                  = "dimensionControl";
     private static final String CBTMODE                  = "battlemode";
+    private static final String MOBCTRL                  = "mobcontrol";
 
     @Configure(category = CAPTURE)
     int                         maxCaptureLevelNormal    = 100;
@@ -30,6 +31,11 @@ public class Config extends ConfigBase
 
     @Configure(category = CBTMODE)
     boolean                     turnbased                = false;
+
+    @Configure(category = MOBCTRL)
+    String[]                    pokemobBlacklist         = { "Wailord" };
+    @Configure(category = MOBCTRL)
+    boolean                     pokemobBlacklistenabled  = false;
 
     public Config()
     {
