@@ -3,9 +3,10 @@ package pokecube.serverutils.ai.pokemob;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.world.World;
-import pokecube.core.ai.thread.IAIRunnable;
 import pokecube.core.ai.thread.aiRunnables.AIAttack;
 import pokecube.core.interfaces.IPokemob;
+import thut.api.entity.ai.IAIMob;
+import thut.api.entity.ai.IAIRunnable;
 
 public class AITurnAttack extends AIAttack
 {
@@ -25,9 +26,9 @@ public class AITurnAttack extends AIAttack
         EntityLivingBase target = attacker.getAttackTarget();
         AITurnAttack task = null;
         task:
-        if (target instanceof IPokemob && ((IPokemob) target).getAIStuff() != null)
+        if (target instanceof IPokemob && ((IAIMob) target).getAI() != null)
         {
-            for (IAIRunnable ai : ((IPokemob) target).getAIStuff().aiTasks)
+            for (IAIRunnable ai : ((IAIMob) target).getAI().aiTasks)
             {
                 if (ai instanceof AITurnAttack)
                 {
@@ -52,6 +53,7 @@ public class AITurnAttack extends AIAttack
                 task.executingOrders = true;
                 task.hasOrders = false;
             }
+            pokemob.setAttackCooldown(delayTime);
         }
         super.doMainThreadTick(world);
     }
