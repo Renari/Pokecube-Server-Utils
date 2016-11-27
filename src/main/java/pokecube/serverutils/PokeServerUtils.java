@@ -30,11 +30,12 @@ import pokecube.core.interfaces.IPokemob;
 import pokecube.core.interfaces.PokecubeMod;
 import pokecube.core.items.pokecubes.EntityPokecube;
 
-@Mod(modid = PokeServerUtils.MODID, name = "Pokecube Server Utils", version = PokeServerUtils.VERSION, dependencies = "required-after:pokecube", acceptableRemoteVersions = "*")
+@Mod(modid = PokeServerUtils.MODID, name = "Pokecube Server Utils", version = PokeServerUtils.VERSION, dependencies = "required-after:pokecube", acceptableRemoteVersions = "*", acceptedMinecraftVersions = PokeServerUtils.MCVERSIONS)
 public class PokeServerUtils
 {
-    public static final String             MODID            = "pokecubeserverutils";
-    public static final String             VERSION          = "1.2.0";
+    public static final String             MODID            = Reference.MODID;
+    public static final String             VERSION          = Reference.VERSION;
+    public final static String             MCVERSIONS       = "[1.9.4,1.12]";
 
     @Instance(value = MODID)
     public static PokeServerUtils          instance;
