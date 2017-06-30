@@ -78,7 +78,7 @@ public class SettingsCommand extends CommandBase
                     text);
             if (check)
             {
-                sender.addChatMessage(mess);
+                sender.sendMessage(mess);
                 return;
             }
             if (!op)
@@ -101,7 +101,7 @@ public class SettingsCommand extends CommandBase
             catch (Exception e)
             {
                 mess = CommandTools.makeTranslatedMessage("pokecube.command.settings.invalid", "gold", args[0]);
-                sender.addChatMessage(mess);
+                sender.sendMessage(mess);
                 CommandTools.sendError(sender, text);
                 return;
             }
@@ -120,7 +120,7 @@ public class SettingsCommand extends CommandBase
                 text += o;
             }
             mess = CommandTools.makeTranslatedMessage("pokecube.command.settings.set", "gold", args[0], text);
-            sender.addChatMessage(mess);
+            sender.sendMessage(mess);
             return;
         }
         catch (Exception e)
@@ -131,19 +131,19 @@ public class SettingsCommand extends CommandBase
     }
 
     @Override
-    public List<String> getCommandAliases()
+    public List<String> getAliases()
     {
         return this.aliases;
     }
 
     @Override
-    public String getCommandName()
+    public String getName()
     {
         return aliases.get(0);
     }
 
     @Override
-    public String getCommandUsage(ICommandSender sender)
+    public String getUsage(ICommandSender sender)
     {
         return "/" + aliases.get(0) + "<option name> <optional:newvalue>";
     }
@@ -156,7 +156,7 @@ public class SettingsCommand extends CommandBase
     }
 
     @Override
-    public List<String> getTabCompletionOptions(MinecraftServer server, ICommandSender sender, String[] args,
+    public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args,
             BlockPos pos)
     {
         List<String> ret = new ArrayList<String>();

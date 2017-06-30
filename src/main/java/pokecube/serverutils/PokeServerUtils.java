@@ -76,9 +76,9 @@ public class PokeServerUtils
             Entity catcher = ((EntityPokecube) evt.pokecube).shootingEntity;
             if (catcher instanceof EntityPlayer)
             {
-                ((EntityPlayer) catcher).addChatMessage(new TextComponentTranslation("pokecube.denied"));
+                ((EntityPlayer) catcher).sendMessage(new TextComponentTranslation("pokecube.denied"));
             }
-            evt.pokecube.entityDropItem(((EntityPokecube) evt.pokecube).getEntityItem(), (float) 0.5);
+            evt.pokecube.entityDropItem(((EntityPokecube) evt.pokecube).getItem(), (float) 0.5);
             evt.pokecube.setDead();
         }
     }
@@ -124,7 +124,7 @@ public class PokeServerUtils
                     pokemob.returnToPokecube();
                     if (pokemob.getPokemonOwner() != null)
                     {
-                        pokemob.getPokemonOwner().addChatMessage(
+                        pokemob.getPokemonOwner().sendMessage(
                                 new TextComponentString(TextFormatting.RED + "You are not allowed to use that."));
                     }
                     break;
@@ -146,7 +146,7 @@ public class PokeServerUtils
                     evt.setCanceled(true);
                     if (evt.pokemob.getPokemonOwner() != null)
                     {
-                        evt.pokemob.getPokemonOwner().addChatMessage(
+                        evt.pokemob.getPokemonOwner().sendMessage(
                                 new TextComponentString(TextFormatting.RED + "You are not allowed to use that."));
                     }
                     break;
