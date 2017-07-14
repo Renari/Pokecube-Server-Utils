@@ -3,6 +3,8 @@ package pokecube.serverutils;
 import java.io.File;
 
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.client.event.ConfigChangedEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import thut.core.common.config.ConfigBase;
 import thut.core.common.config.Configure;
 
@@ -59,6 +61,17 @@ public class Config extends ConfigBase
             PokeServerUtils.instance.dimensionList.add(i);
         PokeServerUtils.turnbasedManager.disable();
         if (turnbased) PokeServerUtils.turnbasedManager.enable();
+    }
+
+    @SubscribeEvent
+    public void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent eventArgs)
+    {
+        if (eventArgs.getModID().equals(Reference.MODID))
+        {
+            populateSettings();
+            applySettings();
+            save();
+        }
     }
 
 }
