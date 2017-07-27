@@ -11,8 +11,8 @@ import pokecube.core.events.InitAIEvent;
 import pokecube.core.events.MoveUse;
 import pokecube.core.interfaces.IMoveConstants;
 import pokecube.core.interfaces.IPokemob;
+import pokecube.core.interfaces.capabilities.CapabilityPokemob;
 import pokecube.serverutils.ai.pokemob.AITurnAttack;
-import thut.api.entity.ai.IAIMob;
 import thut.api.entity.ai.IAIRunnable;
 
 public class TurnBasedManager
@@ -43,10 +43,9 @@ public class TurnBasedManager
     {
         if (!PokeServerUtils.config.turnbased) return;
         boolean angry = event.getPokemob().getPokemonAIState(IPokemob.ANGRY)
-                || ((EntityLiving) event.getPokemob()).getAttackTarget() != null;
+                || event.getPokemob().getEntity().getAttackTarget() != null;
         if (!angry) return;
-        IAIMob mob = (IAIMob) event.getPokemob();
-        for (IAIRunnable ai : mob.getAI().aiTasks)
+        for (IAIRunnable ai : event.getPokemob().getAI().aiTasks)
         {
             if (ai instanceof AITurnAttack)
             {
@@ -61,18 +60,17 @@ public class TurnBasedManager
     @SubscribeEvent
     public void onAttackCommand(InitAIEvent event)
     {
-        IAIMob mob = (IAIMob) event.getPokemob();
-        if (!PokeServerUtils.config.turnbased || mob.getAI() == null) return;
+        if (!PokeServerUtils.config.turnbased || event.getPokemob().getAI() == null) return;
         AITurnAttack attack = new AITurnAttack((EntityLiving) event.getEntity());
-        for (IAIRunnable ai : mob.getAI().aiTasks)
+        for (IAIRunnable ai : event.getPokemob().getAI().aiTasks)
         {
             if (ai instanceof AIAttack)
             {
                 AIAttack old = (AIAttack) ai;
-                mob.getAI().aiTasks.remove(old);
+                event.getPokemob().getAI().aiTasks.remove(old);
                 attack.setMutex(old.getMutex());
                 attack.setPriority(old.getPriority());
-                mob.getAI().aiTasks.add(0, attack);
+                event.getPokemob().getAI().aiTasks.add(0, attack);
                 break;
             }
         }
@@ -81,15 +79,14 @@ public class TurnBasedManager
     @SubscribeEvent
     public void onAttackUse(MoveUse.ActualMoveUse.Init event)
     {
-        if (!PokeServerUtils.config.turnbased || !(event.getTarget() instanceof IPokemob)) return;
+        IPokemob target = CapabilityPokemob.getPokemobFor(event.getTarget());
+        if (!PokeServerUtils.config.turnbased || target == null) return;
         if (event.getUser().getPokemonAIState(IMoveConstants.NOITEMUSE))
         {
-            System.out.println("deny use");
             event.setCanceled(true);
             event.getUser().setPokemonAIState(IMoveConstants.NOITEMUSE, false);
         }
-        IAIMob mob = (IAIMob) event.getUser();
-        for (IAIRunnable ai : mob.getAI().aiTasks)
+        for (IAIRunnable ai : event.getUser().getAI().aiTasks)
         {
             if (ai instanceof AITurnAttack)
             {

@@ -28,6 +28,7 @@ import pokecube.core.events.PostPostInit;
 import pokecube.core.events.SpawnEvent.SendOut;
 import pokecube.core.interfaces.IPokemob;
 import pokecube.core.interfaces.PokecubeMod;
+import pokecube.core.interfaces.capabilities.CapabilityPokemob;
 import pokecube.core.items.pokecubes.EntityPokecube;
 
 @Mod(modid = PokeServerUtils.MODID, name = "Pokecube Server Utils", version = PokeServerUtils.VERSION, dependencies = "required-after:pokecube", acceptableRemoteVersions = "*", acceptedMinecraftVersions = PokeServerUtils.MCVERSIONS)
@@ -113,9 +114,9 @@ public class PokeServerUtils
     @SubscribeEvent
     public void mobTickEvent(LivingUpdateEvent event)
     {
-        if (config.pokemobBlacklistenabled && event.getEntityLiving() instanceof IPokemob)
+        IPokemob pokemob = CapabilityPokemob.getPokemobFor(event.getEntityLiving());
+        if (config.pokemobBlacklistenabled && pokemob != null)
         {
-            IPokemob pokemob = (IPokemob) event.getEntityLiving();
             PokedexEntry entry = pokemob.getPokedexEntry();
             for (String s : config.pokemobBlacklist)
             {

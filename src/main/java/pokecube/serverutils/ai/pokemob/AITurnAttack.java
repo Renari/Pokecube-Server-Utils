@@ -5,19 +5,17 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.world.World;
 import pokecube.core.ai.thread.aiRunnables.AIAttack;
 import pokecube.core.interfaces.IPokemob;
-import thut.api.entity.ai.IAIMob;
+import pokecube.core.interfaces.capabilities.CapabilityPokemob;
 import thut.api.entity.ai.IAIRunnable;
 
 public class AITurnAttack extends AIAttack
 {
     public boolean hasOrders       = false;
     public boolean executingOrders = false;
-    final IPokemob pokemob;
 
     public AITurnAttack(EntityLiving par1EntityLiving)
     {
         super(par1EntityLiving);
-        pokemob = (IPokemob) par1EntityLiving;
     }
 
     @Override
@@ -25,10 +23,11 @@ public class AITurnAttack extends AIAttack
     {
         EntityLivingBase target = attacker.getAttackTarget();
         AITurnAttack task = null;
+        IPokemob targetMob = CapabilityPokemob.getPokemobFor(target);
         task:
-        if (target instanceof IPokemob && ((IAIMob) target).getAI() != null)
+        if (targetMob != null && targetMob.getAI() != null)
         {
-            for (IAIRunnable ai : ((IAIMob) target).getAI().aiTasks)
+            for (IAIRunnable ai : targetMob.getAI().aiTasks)
             {
                 if (ai instanceof AITurnAttack)
                 {
