@@ -42,6 +42,7 @@ public class AITurnAttack extends AIAttack
             if (!bothOrder && !executingOrders)
             {
                 delayTime = 20;
+                task.delayTime = 20;
             }
             else if (hasOrders && task.hasOrders)
             {
