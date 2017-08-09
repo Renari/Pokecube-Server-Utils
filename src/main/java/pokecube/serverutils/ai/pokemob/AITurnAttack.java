@@ -1,6 +1,5 @@
 package pokecube.serverutils.ai.pokemob;
 
-import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.world.World;
 import pokecube.core.ai.thread.aiRunnables.AIAttack;
@@ -13,7 +12,7 @@ public class AITurnAttack extends AIAttack
     public boolean hasOrders       = false;
     public boolean executingOrders = false;
 
-    public AITurnAttack(EntityLiving par1EntityLiving)
+    public AITurnAttack(IPokemob par1EntityLiving)
     {
         super(par1EntityLiving);
     }
