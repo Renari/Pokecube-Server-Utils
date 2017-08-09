@@ -36,7 +36,7 @@ public class PokeServerUtils
 {
     public static final String             MODID            = Reference.MODID;
     public static final String             VERSION          = Reference.VERSION;
-    public final static String             MCVERSIONS       = "[1.9.4,1.12]";
+    public final static String             MCVERSIONS       = "*";
 
     @Instance(value = MODID)
     public static PokeServerUtils          instance;
