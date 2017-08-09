@@ -1,6 +1,5 @@
 package pokecube.serverutils;
 
-import net.minecraft.entity.EntityLiving;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
@@ -61,7 +60,7 @@ public class TurnBasedManager
     public void onAttackCommand(InitAIEvent event)
     {
         if (!PokeServerUtils.config.turnbased || event.getPokemob().getAI() == null) return;
-        AITurnAttack attack = new AITurnAttack((EntityLiving) event.getEntity());
+        AITurnAttack attack = new AITurnAttack(event.getPokemob());
         for (IAIRunnable ai : event.getPokemob().getAI().aiTasks)
         {
             if (ai instanceof AIAttack)
