@@ -30,6 +30,7 @@ import pokecube.core.interfaces.IPokemob;
 import pokecube.core.interfaces.PokecubeMod;
 import pokecube.core.interfaces.capabilities.CapabilityPokemob;
 import pokecube.core.items.pokecubes.EntityPokecube;
+import thut.core.common.commands.CommandConfig;
 
 @Mod(modid = PokeServerUtils.MODID, name = "Pokecube Server Utils", version = PokeServerUtils.VERSION, dependencies = "required-after:pokecube", acceptableRemoteVersions = "*", acceptedMinecraftVersions = PokeServerUtils.MCVERSIONS)
 public class PokeServerUtils
@@ -60,7 +61,7 @@ public class PokeServerUtils
     @EventHandler
     public void serverLoad(FMLServerStartingEvent event)
     {
-        event.registerServerCommand(new SettingsCommand());
+        event.registerServerCommand(new CommandConfig("pokeutilssettings", config));
     }
 
     @SubscribeEvent
