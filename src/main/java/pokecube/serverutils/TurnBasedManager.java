@@ -57,7 +57,7 @@ public class TurnBasedManager
     }
 
     @SubscribeEvent
-    public void onAttackCommand(InitAIEvent event)
+    public void onAIInit(InitAIEvent event)
     {
         if (!PokeServerUtils.config.turnbased || event.getPokemob().getAI() == null) return;
         AITurnAttack attack = new AITurnAttack(event.getPokemob());

@@ -35,7 +35,7 @@ public class Config extends ConfigBase
     boolean                     turnbased                = false;
 
     @Configure(category = MOBCTRL)
-    String[]                    pokemobBlacklist         = { "Wailord" };
+    String[]                    pokemobBlacklist         = {};
     @Configure(category = MOBCTRL)
     boolean                     pokemobBlacklistenabled  = false;
 

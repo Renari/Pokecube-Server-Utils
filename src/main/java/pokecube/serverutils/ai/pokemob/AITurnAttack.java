@@ -40,19 +40,24 @@ public class AITurnAttack extends AIAttack
 
             if (!bothOrder && !executingOrders)
             {
-                delayTime = 20;
-                task.delayTime = 20;
+                pokemob.setAttackCooldown(20);
             }
             else if (hasOrders && task.hasOrders)
             {
-                delayTime = 0;
                 executingOrders = true;
                 hasOrders = false;
-                task.delayTime = 0;
+                pokemob.setAttackCooldown(0);
                 task.executingOrders = true;
                 task.hasOrders = false;
             }
-            pokemob.setAttackCooldown(delayTime);
+            if (executingOrders)
+            {
+                pokemob.setAttackCooldown(0);
+            }
+            else
+            {
+                pokemob.setAttackCooldown(20);
+            }
         }
         super.doMainThreadTick(world);
     }
