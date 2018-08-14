@@ -9,9 +9,9 @@ import pokecube.core.ai.thread.aiRunnables.AIAttack;
 import pokecube.core.events.CommandAttackEvent;
 import pokecube.core.events.InitAIEvent;
 import pokecube.core.events.MoveUse;
-import pokecube.core.interfaces.IMoveConstants;
 import pokecube.core.interfaces.IPokemob;
 import pokecube.core.interfaces.capabilities.CapabilityPokemob;
+import pokecube.core.interfaces.pokemob.ai.CombatStates;
 import pokecube.serverutils.ai.pokemob.AITurnAttack;
 import thut.api.entity.ai.IAIRunnable;
 
@@ -44,7 +44,7 @@ public class TurnBasedManager
     public void onAttackCommand(CommandAttackEvent event)
     {
         if (!PokeServerUtils.config.turnbased) return;
-        boolean angry = event.getPokemob().getPokemonAIState(IPokemob.ANGRY)
+        boolean angry = event.getPokemob().getCombatState(CombatStates.ANGRY)
                 || event.getPokemob().getEntity().getAttackTarget() != null;
         if (!angry) return;
         for (IAIRunnable ai : event.getPokemob().getAI().aiTasks)
@@ -83,10 +83,10 @@ public class TurnBasedManager
     {
         IPokemob target = CapabilityPokemob.getPokemobFor(event.getTarget());
         if (!PokeServerUtils.config.turnbased || target == null) return;
-        if (event.getUser().getPokemonAIState(IMoveConstants.NOITEMUSE))
+        if (event.getUser().getCombatState(CombatStates.NOITEMUSE))
         {
             event.setCanceled(true);
-            event.getUser().setPokemonAIState(IMoveConstants.NOITEMUSE, false);
+            event.getUser().setCombatState(CombatStates.NOITEMUSE, false);
         }
         for (IAIRunnable ai : event.getUser().getAI().aiTasks)
         {
