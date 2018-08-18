@@ -5,7 +5,7 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import pokecube.core.PokecubeCore;
-import pokecube.core.ai.thread.aiRunnables.AIAttack;
+import pokecube.core.ai.thread.aiRunnables.combat.AIAttack;
 import pokecube.core.events.CommandAttackEvent;
 import pokecube.core.events.InitAIEvent;
 import pokecube.core.events.MoveUse;

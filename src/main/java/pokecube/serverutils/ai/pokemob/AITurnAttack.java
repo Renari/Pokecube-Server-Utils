@@ -2,7 +2,7 @@ package pokecube.serverutils.ai.pokemob;
 
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.world.World;
-import pokecube.core.ai.thread.aiRunnables.AIAttack;
+import pokecube.core.ai.thread.aiRunnables.combat.AIAttack;
 import pokecube.core.interfaces.IPokemob;
 import pokecube.core.interfaces.capabilities.CapabilityPokemob;
 import thut.api.entity.ai.IAIRunnable;
